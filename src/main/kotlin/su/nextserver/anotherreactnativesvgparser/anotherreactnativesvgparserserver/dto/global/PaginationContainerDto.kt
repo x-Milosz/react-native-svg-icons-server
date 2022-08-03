@@ -5,13 +5,13 @@ import java.util.*
 class PaginationContainerDto<T> {
     var page = 0
     var pages = 0
-    var quantity = 0
+    var total = 0
     var contentList: List<T>? = null
 
-    constructor(page: Int, pages: Int, quantity: Int, contentList: List<T>?) {
+    constructor(page: Int, pages: Int, total: Int, contentList: List<T>?) {
         this.page = page
         this.pages = pages
-        this.quantity = quantity
+        this.total = total
         this.contentList = contentList
     }
 
@@ -24,7 +24,7 @@ class PaginationContainerDto<T> {
                 + ", pages="
                 + pages
                 + ", count="
-                + quantity
+                + total
                 + ", contentList="
                 + contentList
                 + '}')
@@ -34,10 +34,10 @@ class PaginationContainerDto<T> {
         if (this === o) return true
         if (o !is PaginationContainerDto<*>) return false
         val that = o
-        return page == that.page && pages == that.pages && quantity == that.quantity && contentList == that.contentList
+        return page == that.page && pages == that.pages && total == that.total && contentList == that.contentList
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(page, pages, quantity, contentList)
+        return Objects.hash(page, pages, total, contentList)
     }
 }

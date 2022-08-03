@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserver.dto.icon.IconListItemDto
 import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserver.entity.Icon
 import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserver.repository.IconRepository
 import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserver.service.internal.ConvenienceService
@@ -54,10 +55,10 @@ class IconService(
 
 
             return convenienceService.responseService.wrapWithPaginationContainer(
-                responsePage.toList(),
+                responsePage.toList().map { IconListItemDto(it.id, it.name) },
                 page + 1,
                 responsePage.totalPages,
-                responsePage.size,
+                responsePage.totalElements.toInt(),
                 "getIconsSuccessful"
             )
         } catch (e: Error) {

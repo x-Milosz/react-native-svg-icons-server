@@ -33,21 +33,21 @@ class ResponseService(private val messageSource: MessageSource) {
         contentList: List<T>,
         page: Int,
         pages: Int,
-        quantity: Int,
+        total: Int,
         code: String?
     ): ResponseEntity<*>? {
-        return wrap(PaginationContainerDto(page, pages, quantity, contentList), code)
+        return wrap(PaginationContainerDto(page, pages, total, contentList), code)
     }
 
     fun <T> wrapWithPaginationContainer(
         contentList: List<T>,
         page: Int,
         pages: Int,
-        quantity: Int,
+        total: Int,
         code: String?,
         statusCode: Int
     ): ResponseEntity<*>? {
-        return wrap(PaginationContainerDto(page, pages, quantity, contentList), code, statusCode)
+        return wrap(PaginationContainerDto(page, pages, total, contentList), code, statusCode)
     }
 
 
