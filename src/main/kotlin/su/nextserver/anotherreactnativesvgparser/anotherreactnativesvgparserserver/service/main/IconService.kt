@@ -3,13 +3,21 @@ package su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserser
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.ResponseEntity
+import org.springframework.scheduling.annotation.Async
+import org.springframework.scheduling.annotation.AsyncResult
 import org.springframework.stereotype.Service
+import org.springframework.util.concurrent.ListenableFutureTask
 import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserver.dto.icon.IconListItemDto
+import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserver.dto.icon.IconSvgDto
 import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserver.entity.Icon
 import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserver.repository.IconRepository
 import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserver.service.internal.ConvenienceService
 import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserver.service.internal.IconScannerService
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.nio.charset.StandardCharsets
 import java.util.*
+import java.util.concurrent.Future
 import javax.transaction.Transactional
 
 
@@ -74,4 +82,35 @@ class IconService(
 
         return iconRepository.findByOrderByNameAsc(pageRequest)
     }
+
+    @Async("taskExecutor")
+    fun getIconSvg(iconId: Long): Future<ResponseEntity<*>>? {
+        try {
+            val requestedIconOptional = iconRepository.findById(iconId)
+            if (requestedIconOptional.isEmpty) {
+                convenienceService.exceptionOperatorService.throwException("getIconSvgNotFound")
+                return null;
+            }
+
+            val requestedIconInputStream =
+                javaClass.classLoader.getResourceAsStream("MaterialDesign/svg/${requestedIconOptional.get().name}.svg")
+            if(requestedIconInputStream == null) {
+                convenienceService.exceptionOperatorService.throwException("getIconSvgCouldNotRead")
+                return null
+            }
+
+            val inputStreamReader = InputStreamReader(requestedIconInputStream, StandardCharsets.UTF_8)
+            val bufferedReader = BufferedReader(inputStreamReader)
+            val svg = bufferedReader.readText()
+            bufferedReader.close()
+            inputStreamReader.close()
+            requestedIconInputStream.close()
+
+            return AsyncResult(convenienceService.responseService.wrap(IconSvgDto(svg), "getIconSvgSuccessful"))
+        } catch (e: Error) {
+            convenienceService.exceptionOperatorService.intercept(e)
+            return null
+        }
+    }
+
 }

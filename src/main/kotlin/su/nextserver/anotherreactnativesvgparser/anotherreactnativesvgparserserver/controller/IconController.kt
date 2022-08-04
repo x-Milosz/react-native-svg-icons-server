@@ -2,6 +2,7 @@ package su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserser
 
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -19,5 +20,10 @@ class IconController(
         @RequestParam(required = false) search: String?
     ): ResponseEntity<*>? {
         return iconService.getIcons(page, pageSize, search);
+    }
+
+    @GetMapping("/{id}")
+    fun getIconSvg(@PathVariable(name = "id") iconId: Long): ResponseEntity<*>? {
+        return iconService.getIconSvg(iconId)?.get()
     }
 }
