@@ -7,8 +7,7 @@ import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserv
 
 
 interface IconRepository : JpaRepository<Icon, Long> {
+    fun findByOrderByNameAsc(pageable: Pageable): Page<Icon>
 
-
-    fun findByNameContainsAllIgnoreCase(name: String, pageable: Pageable): Page<Icon>
-
+    fun findByNameContainsAllIgnoreCaseOrderByNameAsc(name: String, pageable: Pageable): Page<Icon>
 }

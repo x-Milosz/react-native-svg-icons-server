@@ -69,9 +69,9 @@ class IconService(
 
     private fun searchIcons(pageRequest: PageRequest, wantedSearch: String?): Page<Icon> {
         if (wantedSearch != null) {
-            return iconRepository.findByNameContainsAllIgnoreCase(wantedSearch, pageRequest)
+            return iconRepository.findByNameContainsAllIgnoreCaseOrderByNameAsc(wantedSearch, pageRequest)
         }
 
-        return iconRepository.findAll(pageRequest)
+        return iconRepository.findByOrderByNameAsc(pageRequest)
     }
 }
