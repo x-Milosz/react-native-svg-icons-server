@@ -33,7 +33,7 @@ class IconService(
 
         iconRepository.deleteAll()
         val dummyDate = Date()
-        iconRepository.saveAll(svgNames.map { Icon(0, it, dummyDate, dummyDate) })
+        iconRepository.saveAll(svgNames.map { Icon(0, it.split(".")[0], dummyDate, dummyDate) })
     }
 
 

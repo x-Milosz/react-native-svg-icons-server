@@ -6,6 +6,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.stream.Collectors
+import kotlin.io.path.name
 
 
 @Service
@@ -15,10 +16,11 @@ class IconScannerService {
     fun scanSvgs(): Set<String> {
         try {
             val svgFileNames =
-                Files.walk(Paths.get(svgsLocationPath.path)).map { it.fileName.toString() }.collect(Collectors.toSet())
+                Files.walk(Paths.get(svgsLocationPath.path)).map { it.fileName.name }.filter { it != "svg" }
+                    .collect(Collectors.toSet())
             return svgFileNames
         } catch (e: Error) {
-            println("IconScannerService::scanSvgs: ${e.toString()}")
+            println("IconScannerService::scanSvgs: ${e}")
             return emptySet()
         }
     }
