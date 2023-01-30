@@ -1,6 +1,7 @@
 package su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserver.controller
 
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -13,6 +14,7 @@ import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserv
 class IconController(
     private val iconService: IconService,
 ) {
+    @CrossOrigin(origins = arrayOf("http://localhost:3000/"))
     @GetMapping
     fun getIcons(
         @RequestParam(required = false) page: Int?,
@@ -22,6 +24,7 @@ class IconController(
         return iconService.getIcons(page, pageSize, search);
     }
 
+    @CrossOrigin(origins = arrayOf("http://localhost:3000/"))
     @GetMapping("/{id}")
     fun getIconSvg(@PathVariable(name = "id") iconId: Long): ResponseEntity<*>? {
         return iconService.getIconSvg(iconId)?.get()

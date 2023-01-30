@@ -106,7 +106,7 @@ class IconService(
             inputStreamReader.close()
             requestedIconInputStream.close()
 
-            return AsyncResult(convenienceService.responseService.wrap(IconSvgDto(svg, requestedIconOptional.get().name), "getIconSvgSuccessful"))
+            return AsyncResult(convenienceService.responseService.wrap(IconSvgDto(requestedIconOptional.get().name, svg), "getIconSvgSuccessful"))
         } catch (e: Error) {
             convenienceService.exceptionOperatorService.intercept(e)
             return null
