@@ -2,5 +2,6 @@ package su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserser
 
 data class IconListItemDto(
     var id: Long,
-    var name: String
+    var name: String,
+    var svg: String,
 )

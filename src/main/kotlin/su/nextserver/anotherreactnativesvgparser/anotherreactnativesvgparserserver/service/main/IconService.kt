@@ -3,29 +3,29 @@ package su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserser
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.ResponseEntity
-import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.AsyncResult
 import org.springframework.stereotype.Service
-import org.springframework.util.concurrent.ListenableFutureTask
 import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserver.dto.icon.IconListItemDto
 import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserver.dto.icon.IconSvgDto
 import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserver.entity.Icon
 import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserver.repository.IconRepository
 import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserver.service.internal.ConvenienceService
 import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserver.service.internal.IconScannerService
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.nio.charset.StandardCharsets
+import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserver.service.internal.svgfilereader.ReadSvgFile
+import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserver.service.internal.svgfilereader.SvgFileName
+import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserver.service.internal.svgfilereader.SvgFileReaderService
 import java.util.*
 import java.util.concurrent.Future
 import javax.transaction.Transactional
+import kotlin.collections.ArrayList
 
 
 @Service
 class IconService(
     private val iconRepository: IconRepository,
     private val iconScannerService: IconScannerService,
-    private val convenienceService: ConvenienceService
+    private val convenienceService: ConvenienceService,
+    private val svgFileReaderService: SvgFileReaderService
 ) {
     /**
      * Refreshes database icons when database or resource icons number has changed
@@ -61,9 +61,11 @@ class IconService(
 
             val responsePage = searchIcons(pageRequest, wantedSearch)
 
+            val svgFiles = svgFileReaderService.readMultipleSvgFiles(responsePage.map { SvgFileName(it.id, it.name) }.toList())
+            val properContent = matchQueriedIconListWithFiles(responsePage.toList(), svgFiles)
 
             return convenienceService.responseService.wrapWithPaginationContainer(
-                responsePage.toList().map { IconListItemDto(it.id, it.name) },
+                properContent,
                 page + 1,
                 responsePage.totalPages,
                 responsePage.totalElements.toInt(),
@@ -75,6 +77,19 @@ class IconService(
         }
     }
 
+    private fun matchQueriedIconListWithFiles(icons: List<Icon>, svgFiles: List<ReadSvgFile>): List<IconListItemDto> {
+        val iconListItemDtoList: ArrayList<IconListItemDto> = ArrayList()
+        for(icon in icons) {
+            for(svgFile in svgFiles) {
+                if(icon.id == svgFile.id) {
+                    iconListItemDtoList.add(IconListItemDto(icon.id, icon.name, svgFile.svg))
+                    break
+                }
+            }
+        }
+        return iconListItemDtoList
+    }
+
     private fun searchIcons(pageRequest: PageRequest, wantedSearch: String?): Page<Icon> {
         if (wantedSearch != null) {
             return iconRepository.findByNameContainsAllIgnoreCaseOrderByNameAsc(wantedSearch, pageRequest)
@@ -83,7 +98,6 @@ class IconService(
         return iconRepository.findByOrderByNameAsc(pageRequest)
     }
 
-    @Async("taskExecutor")
     fun getIconSvg(iconId: Long): Future<ResponseEntity<*>>? {
         try {
             val requestedIconOptional = iconRepository.findById(iconId)
@@ -92,19 +106,7 @@ class IconService(
                 return null;
             }
 
-            val requestedIconInputStream =
-                javaClass.classLoader.getResourceAsStream("MaterialDesign/svg/${requestedIconOptional.get().name}.svg")
-            if(requestedIconInputStream == null) {
-                convenienceService.exceptionOperatorService.throwException("getIconSvgCouldNotRead")
-                return null
-            }
-
-            val inputStreamReader = InputStreamReader(requestedIconInputStream, StandardCharsets.UTF_8)
-            val bufferedReader = BufferedReader(inputStreamReader)
-            val svg = bufferedReader.readText()
-            bufferedReader.close()
-            inputStreamReader.close()
-            requestedIconInputStream.close()
+            val svg = svgFileReaderService.readSingleSvgFile(requestedIconOptional.get().name)
 
             return AsyncResult(convenienceService.responseService.wrap(IconSvgDto(requestedIconOptional.get().name, svg), "getIconSvgSuccessful"))
         } catch (e: Error) {
