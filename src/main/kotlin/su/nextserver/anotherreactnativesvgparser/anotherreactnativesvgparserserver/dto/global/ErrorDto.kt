@@ -18,7 +18,7 @@ class ErrorDto {
         this.errorType = errorType
     }
 
-    constructor() {}
+    constructor()
 
     fun setTime(time: Date) {
         this.time = time.toString()

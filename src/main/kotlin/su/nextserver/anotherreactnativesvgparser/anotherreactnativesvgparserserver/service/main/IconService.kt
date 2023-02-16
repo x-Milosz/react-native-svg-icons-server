@@ -17,7 +17,6 @@ import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserv
 import java.util.*
 import java.util.concurrent.Future
 import javax.transaction.Transactional
-import kotlin.collections.ArrayList
 
 
 @Service
@@ -61,7 +60,8 @@ class IconService(
 
             val responsePage = searchIcons(pageRequest, wantedSearch)
 
-            val svgFiles = svgFileReaderService.readMultipleSvgFiles(responsePage.map { SvgFileName(it.id, it.name) }.toList())
+            val svgFiles =
+                svgFileReaderService.readMultipleSvgFiles(responsePage.map { SvgFileName(it.id, it.name) }.toList())
             val properContent = matchQueriedIconListWithFiles(responsePage.toList(), svgFiles)
 
             return convenienceService.responseService.wrapWithPaginationContainer(
@@ -79,9 +79,9 @@ class IconService(
 
     private fun matchQueriedIconListWithFiles(icons: List<Icon>, svgFiles: List<ReadSvgFile>): List<IconListItemDto> {
         val iconListItemDtoList: ArrayList<IconListItemDto> = ArrayList()
-        for(icon in icons) {
-            for(svgFile in svgFiles) {
-                if(icon.id == svgFile.id) {
+        for (icon in icons) {
+            for (svgFile in svgFiles) {
+                if (icon.id == svgFile.id) {
                     iconListItemDtoList.add(IconListItemDto(icon.id, icon.name, svgFile.svg))
                     break
                 }
@@ -103,12 +103,19 @@ class IconService(
             val requestedIconOptional = iconRepository.findById(iconId)
             if (requestedIconOptional.isEmpty) {
                 convenienceService.exceptionOperatorService.throwException("getIconSvgNotFound")
-                return null;
+                return null
             }
 
             val svg = svgFileReaderService.readSingleSvgFile(requestedIconOptional.get().name)
 
-            return AsyncResult(convenienceService.responseService.wrap(IconSvgDto(requestedIconOptional.get().name, svg), "getIconSvgSuccessful"))
+            return AsyncResult(
+                convenienceService.responseService.wrap(
+                    IconSvgDto(
+                        requestedIconOptional.get().name,
+                        svg
+                    ), "getIconSvgSuccessful"
+                )
+            )
         } catch (e: Error) {
             convenienceService.exceptionOperatorService.intercept(e)
             return null

@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class AnotherreactnativesvgparserserverApplication
 
 fun main(args: Array<String>) {
-	runApplication<AnotherreactnativesvgparserserverApplication>(*args)
+    runApplication<AnotherreactnativesvgparserserverApplication>(*args)
 }

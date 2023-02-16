@@ -15,7 +15,7 @@ class PaginationContainerDto<T> {
         this.contentList = contentList
     }
 
-    constructor() {}
+    constructor()
 
     override fun toString(): String {
         return ("PaginationContainerDto{"

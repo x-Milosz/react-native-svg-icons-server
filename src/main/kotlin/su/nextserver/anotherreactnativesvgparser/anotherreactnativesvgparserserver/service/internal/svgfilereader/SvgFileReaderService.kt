@@ -1,7 +1,6 @@
 package su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserver.service.internal.svgfilereader
 
 import org.springframework.stereotype.Service
-import org.springframework.web.servlet.function.ServerResponse.async
 import su.nextserver.anotherreactnativesvgparser.anotherreactnativesvgparserserver.service.internal.ConvenienceService
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -19,7 +18,7 @@ class SvgFileReaderService(
     fun readSingleSvgFile(svgFileName: String): String {
         val requestedIconInputStream =
             javaClass.classLoader.getResourceAsStream("MaterialDesign/svg/${svgFileName}.svg")
-        if(requestedIconInputStream == null) {
+        if (requestedIconInputStream == null) {
             convenienceService.exceptionOperatorService.throwException("getIconSvgCouldNotRead")
             return ""
         }
@@ -45,14 +44,14 @@ class SvgFileReaderService(
         val readFiles: ArrayList<ReadSvgFile> = ArrayList()
 
         val threads: ArrayList<Thread> = ArrayList()
-        for(i in 0..5) {
-            threads.add( Thread {
-                while(true) {
+        for (i in 0..5) {
+            threads.add(Thread {
+                while (true) {
                     restOfSizeSemaphore.acquireUninterruptibly()
                     val currentIndex = restOfSizes
                     restOfSizes--
                     restOfSizeSemaphore.release()
-                    if(currentIndex < 0) {
+                    if (currentIndex < 0) {
                         break
                     }
 
@@ -69,14 +68,14 @@ class SvgFileReaderService(
             })
         }
 
-        for(thread in threads) {
+        for (thread in threads) {
             thread.start()
         }
 
-        for(thread in threads) {
+        for (thread in threads) {
             thread.join()
         }
 
-        return  readFiles
+        return readFiles
     }
 }
