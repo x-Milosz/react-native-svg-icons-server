@@ -1,9 +1,9 @@
 pipeline {
-    agent {
-        docker {
-            image 'gradle'
-        }
-    }
+//     agent {
+//         docker {
+//             image 'gradle'
+//         }
+//     }
     stages {
         stage('Build') {
             steps {
