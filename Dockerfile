@@ -1,0 +1,18 @@
+FROM openjdk:11-jdk-slim
+
+ARG DATABASE_HOST
+ENV DATABASE_HOST ${DATABASE_HOST}
+ARG DATABASE_USERNAME
+ENV DATABSE_USERNAME ${DATABASE_USERNAME}
+ARG DATABASE_PASSWORD
+ENV DATABSE_PASSWORD ${DATABASE_PASSWORD}
+
+WORKDIR /app
+
+COPY . .
+
+RUN ./gradlew clean jar
+
+EXPOSE 8080
+
+CMD ["java", "-jar", "build/libs/react-native-svg-icons-server.jar"]

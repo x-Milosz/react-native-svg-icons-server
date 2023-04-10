@@ -41,3 +41,7 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+
+tasks.jar {
+	archiveFileName.set("react-native-svg-icons-server.jar")
+}
