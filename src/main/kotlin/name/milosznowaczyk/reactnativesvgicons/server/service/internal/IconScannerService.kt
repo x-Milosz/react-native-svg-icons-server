@@ -1,10 +1,8 @@
 package name.milosznowaczyk.reactnativesvgicons.server.service.internal
 
+import org.springframework.core.io.Resource
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver
 import org.springframework.stereotype.Service
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.util.stream.Collectors
-import kotlin.io.path.name
 
 
 @Service
@@ -12,15 +10,31 @@ class IconScannerService {
     private val svgsLocationPath = this.javaClass.classLoader.getResource("MaterialDesign/svg")
 
     fun scanSvgs(): Set<String> {
-        try {
-            val svgFileNames =
-                Files.walk(Paths.get(svgsLocationPath.path)).map { it.fileName.name }.filter { it != "svg" }
-                    .collect(Collectors.toSet())
-            return svgFileNames
+        return try {
+
+            val scannedPackage = "MaterialDesign/svg/*"
+            val scanner = PathMatchingResourcePatternResolver()
+            val resources = scanner.getResources(scannedPackage)
+                .filter{ checkIfResourcesIsSvg(it)}
+                .map { extractFileName(it) }.toSet()
+
+            resources
         } catch (e: Error) {
             println("IconScannerService::scanSvgs: ${e}")
-            return emptySet()
+            emptySet()
         }
     }
 
+    private fun checkIfResourcesIsSvg(res: Resource): Boolean {
+        val tmp = res.url.path.split("/");
+        if (tmp.size < 3) {
+            return false
+        }
+        return tmp[tmp.size - 2] == "svg"
+    }
+
+    private fun extractFileName(res: Resource): String {
+        val tmp = res.url.path.split("/");
+        return tmp[tmp.size - 1];
+    }
 }

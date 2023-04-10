@@ -44,7 +44,7 @@ class SvgFileReaderService(
         val readFiles: ArrayList<ReadSvgFile> = ArrayList()
 
         val threads: ArrayList<Thread> = ArrayList()
-        for (i in 0..5) {
+        for (i in 0..3) {
             threads.add(Thread {
                 while (true) {
                     restOfSizeSemaphore.acquireUninterruptibly()
