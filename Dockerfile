@@ -11,7 +11,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN ./gradlew clean jar
+RUN ./gradlew bootJar
 
 EXPOSE 8080
 
