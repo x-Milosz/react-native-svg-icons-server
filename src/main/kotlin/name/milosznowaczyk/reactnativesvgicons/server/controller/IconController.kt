@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*
 class IconController(
     private val iconService: IconService,
 ) {
-    @CrossOrigin(origins = arrayOf("http://localhost:3000/"))
+    @CrossOrigin(origins = arrayOf("http://localhost:3000/", "https://api.react-native-svg-icons.xn--miosznowaczyk-xhc.name/"))
     @GetMapping
     fun getIcons(
         @RequestParam(required = false) page: Int?,
@@ -19,7 +19,7 @@ class IconController(
         return iconService.getIcons(page, pageSize, search)
     }
 
-    @CrossOrigin(origins = arrayOf("http://localhost:3000/"))
+    @CrossOrigin(origins = arrayOf("http://localhost:3000/, https://api.react-native-svg-icons.xn--miosznowaczyk-xhc.name/"))
     @GetMapping("/{id}")
     fun getIconSvg(@PathVariable(name = "id") iconId: Long): ResponseEntity<*>? {
         return iconService.getIconSvg(iconId)?.get()
